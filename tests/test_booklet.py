@@ -42,3 +42,27 @@ def test_booklet_scaled_to_sheet(make_pdf, tmp_path):
     page = PdfReader(str(output)).pages[0]
     assert float(page.mediabox.width) == 842.0
     assert float(page.mediabox.height) == 595.0
+
+
+def test_booklet_mixed_page_sizes_auto_sheet_fits_largest_page(make_sized_pdf, tmp_path):
+    # Three portrait A5 pages plus one landscape page (a wide table, or a page
+    # a previous `rotate` call turned 90 degrees) mixed into the same document.
+    source = make_sized_pdf([(420.0, 595.0), (595.0, 420.0), (420.0, 595.0), (420.0, 595.0)])
+    output = tmp_path / "out.pdf"
+    spreads = booklet(source, output)
+    pages = PdfReader(str(output)).pages
+    assert spreads == 2
+    # The sheet must accommodate the widest and tallest page in the document,
+    # not assume every page matches the first page's dimensions.
+    assert float(pages[0].mediabox.width) == 2 * 595.0
+    assert float(pages[0].mediabox.height) == 595.0
+
+
+def test_booklet_mixed_page_sizes_scaled_to_sheet(make_sized_pdf, tmp_path):
+    source = make_sized_pdf([(420.0, 595.0), (595.0, 420.0), (420.0, 595.0), (420.0, 595.0)])
+    output = tmp_path / "out.pdf"
+    spreads = booklet(source, output, sheet="a4")
+    assert spreads == 2
+    page = PdfReader(str(output)).pages[0]
+    assert float(page.mediabox.width) == 842.0
+    assert float(page.mediabox.height) == 595.0

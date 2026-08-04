@@ -61,25 +61,32 @@ def booklet(
         if page.rotation:
             page.transfer_rotation_to_content()
 
-    width = float(reader.pages[0].mediabox.width)
-    height = float(reader.pages[0].mediabox.height)
     if sheet is None:
-        sheet_w, sheet_h = 2 * width, height
-        scale = 1.0
+        max_width = max(float(p.mediabox.width) for p in reader.pages)
+        max_height = max(float(p.mediabox.height) for p in reader.pages)
+        sheet_w, sheet_h = 2 * max_width, max_height
     else:
         sheet_w, sheet_h = SHEET_SIZES[sheet]
-        scale = min(sheet_w / (2 * width), sheet_h / height)
-    x_offset = (sheet_w - 2 * width * scale) / 2
-    y_offset = (sheet_h - height * scale) / 2
+    slot_w, slot_h = sheet_w / 2, sheet_h
 
     writer = PdfWriter()
     for left, right in spreads:
         page = writer.add_blank_page(width=sheet_w, height=sheet_h)
-        for index, shift in ((left, 0.0), (right, width * scale)):
+        for index, shift in ((left, 0.0), (right, slot_w)):
             if index is None:
                 continue
-            transform = Transformation().scale(scale).translate(x_offset + shift, y_offset)
-            page.merge_transformed_page(reader.pages[index], transform)
+            source_page = reader.pages[index]
+            page_w = float(source_page.mediabox.width)
+            page_h = float(source_page.mediabox.height)
+            # Each page is scaled independently to fit its slot, so a document
+            # with mixed page sizes (a landscape page in a portrait document,
+            # or a page previously rotated 90/270 degrees) still imposes
+            # correctly instead of being placed using another page's geometry.
+            scale = min(slot_w / page_w, slot_h / page_h)
+            x_offset = shift + (slot_w - page_w * scale) / 2
+            y_offset = (slot_h - page_h * scale) / 2
+            transform = Transformation().scale(scale).translate(x_offset, y_offset)
+            page.merge_transformed_page(source_page, transform)
     with open(output, "wb") as handle:
         writer.write(handle)
     return len(spreads)
