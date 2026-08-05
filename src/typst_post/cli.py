@@ -33,7 +33,14 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=0,
         metavar="N",
-        help="pages per folded signature, a multiple of 4 (default: whole document)",
+        help="pages per folded signature, a multiple of 4 for --layout 2up or 8 for "
+        "4up (default: whole document)",
+    )
+    p.add_argument(
+        "--layout",
+        choices=("2up", "4up"),
+        default="2up",
+        help="2 or 4 logical pages per side (default: 2up)",
     )
 
     p = sub.add_parser("rotate", help="rotate pages, e.g. 2:180 or 5-8:90 or all:180")
@@ -77,8 +84,10 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     try:
         if args.command == "booklet":
-            spreads = booklet(args.input, output, sheet=args.sheet, signature=args.signature)
-            print(f"wrote {output} ({spreads} spreads)")
+            pages = booklet(
+                args.input, output, sheet=args.sheet, signature=args.signature, layout=args.layout
+            )
+            print(f"wrote {output} ({pages} pages)")
         elif args.command == "rotate":
             rotate(args.input, args.specs, output)
             print(f"wrote {output}")

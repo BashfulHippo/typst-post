@@ -43,6 +43,15 @@ spreads onto a named size (a3, a4, a5, letter, legal) instead. `--signature`
 splits the document into folded signatures of N pages (a multiple of 4) for
 thicker, bound booklets.
 
+`--layout 4up` imposes four pages per side instead of two: each physical
+sheet becomes an independent 8-page signature (two perpendicular folds),
+with signatures gathered and bound together. Requires `--signature` to be a
+multiple of 8.
+
+```
+typst-post booklet chapbook.pdf --layout 4up --signature 16
+```
+
 ### rotate
 
 Rotate individual pages by multiples of 90 degrees.
