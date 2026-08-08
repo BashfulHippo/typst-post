@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "typst-post"
-version = "0.1.1"
+version = "0.2.0"
 description = "Post-compilation utilities for Typst: booklet imposition, page rotation, reordering, and project packing."
 readme = "README.md"
 license = { text = "MIT" }

@@ -52,6 +52,10 @@ multiple of 8.
 typst-post booklet chapbook.pdf --layout 4up --signature 16
 ```
 
+The 4-up page/rotation layout was verified against a real imposition
+example generously shared by
+[John Blommers](https://github.com/johnblommers/Imposition-Example).
+
 ### rotate
 
 Rotate individual pages by multiples of 90 degrees.
@@ -91,7 +95,6 @@ Typst restores packages on its own.
 ## Roadmap
 
 - Creep compensation and inner margins for thick booklets
-- n-up imposition beyond 2-up
 - Watch hooks: re-run any of the above on `typst watch` recompiles
   ([typst#3362](https://github.com/typst/typst/issues/3362))
 
